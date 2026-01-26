@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap">
     <style>
+        /* 基础样式 */
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +16,6 @@
         
         body {
             font-family: 'Poppins', 'Noto Sans SC', sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
@@ -25,12 +23,76 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: background 0.5s ease, color 0.3s ease;
+        }
+        
+        /* 主题样式 */
+        .theme-light {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+        
+        .theme-dark {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #f5f5f5;
+        }
+        
+        .theme-blue {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
         }
         
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+        
+        /* 加载动画 */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 离线版标识 */
+        .offline-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 10;
+            display: none;
         }
         
         .container {
@@ -49,6 +111,11 @@
             animation: fadeIn 1s ease-out;
         }
         
+        .theme-dark .card {
+            background-color: rgba(30, 30, 40, 0.92);
+            color: #f5f5f5;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -60,6 +127,14 @@
             padding: 30px;
             text-align: center;
             position: relative;
+        }
+        
+        .theme-dark .header {
+            background: linear-gradient(90deg, #1a1a2e, #16213e);
+        }
+        
+        .theme-blue .header {
+            background: linear-gradient(90deg, #1a2a6c, #2c3e50);
         }
         
         .avatar-container {
@@ -90,6 +165,15 @@
             transform: scale(1.05);
         }
         
+        .avatar-error {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            font-size: 3rem;
+        }
+        
         .name {
             font-size: 2.5rem;
             font-weight: 600;
@@ -103,26 +187,82 @@
             font-weight: 300;
         }
         
-        .lang-toggle {
+        /* 修改：将控制按钮分为左右两组 */
+        .header-controls {
             position: absolute;
             top: 20px;
+            left: 20px;
             right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-controls-left {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-controls-right {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 修改：调整主题切换按钮样式，添加文字 */
+        .theme-toggle {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 5px 10px;
+            padding: 8px 15px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            color: white;
+            font-family: inherit;
+            min-width: 220px; /* 给按钮足够的宽度显示文字 */
         }
         
-        .lang-toggle:hover {
+        .lang-toggle, .download-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border: none;
+            color: white;
+            font-family: inherit;
+        }
+        
+        .theme-toggle:hover, .lang-toggle:hover, .download-btn:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .theme-icon {
+            font-size: 1rem;
+        }
+        
+        .theme-text {
+            font-weight: 500;
         }
         
         .content {
             display: flex;
             flex-wrap: wrap;
             padding: 30px;
+        }
+        
+        .theme-dark .content {
+            color: #f5f5f5;
         }
         
         .info-section {
@@ -138,6 +278,11 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #eee;
             position: relative;
+        }
+        
+        .theme-dark .section-title {
+            color: #f5f5f5;
+            border-bottom-color: #444;
         }
         
         .section-title:after {
@@ -164,6 +309,10 @@
             transform: translateX(5px);
         }
         
+        .theme-dark .info-item:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
         .info-icon {
             width: 50px;
             height: 50px;
@@ -184,10 +333,18 @@
             margin-bottom: 5px;
         }
         
+        .theme-dark .info-content h3 {
+            color: #bdc3c7;
+        }
+        
         .info-content p {
             font-size: 1.2rem;
             color: #2c3e50;
             font-weight: 500;
+        }
+        
+        .theme-dark .info-content p {
+            color: #f5f5f5;
         }
         
         .links-section {
@@ -214,9 +371,18 @@
             color: inherit;
         }
         
+        .theme-dark .link-item {
+            background: rgba(40, 40, 50, 0.9);
+            color: #f5f5f5;
+        }
+        
         .link-item:hover {
             transform: translateY(-8px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-dark .link-item:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
         
         .link-icon {
@@ -231,6 +397,10 @@
         .link-name {
             font-weight: 500;
             color: #2c3e50;
+        }
+        
+        .theme-dark .link-name {
+            color: #f5f5f5;
         }
         
         .link-item.github {
@@ -254,6 +424,10 @@
             font-style: italic;
         }
         
+        .theme-dark .hidden-info {
+            color: #7f8c8d;
+        }
+        
         .flag {
             margin-left: 8px;
             font-size: 1.2em;
@@ -266,6 +440,12 @@
             font-size: 0.9rem;
             border-top: 1px solid #eee;
             background: rgba(245, 245, 245, 0.8);
+        }
+        
+        .theme-dark .footer {
+            color: #bdc3c7;
+            border-top-color: #444;
+            background: rgba(30, 30, 40, 0.8);
         }
         
         .pulse {
@@ -284,6 +464,40 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
         
+        /* 下载提示样式 */
+        .download-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideIn 0.5s ease-out;
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.3s;
+        }
+        
+        .download-toast.hide {
+            transform: translateY(100px);
+            opacity: 0;
+        }
+        
+        .download-toast.error {
+            background: #e74c3c;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
         @media (max-width: 768px) {
             .content {
                 flex-direction: column;
@@ -298,21 +512,97 @@
                 width: 130px;
                 height: 130px;
             }
+            
+            .header-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-controls-left, .header-controls-right {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .theme-toggle {
+                min-width: auto;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .lang-toggle, .download-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .download-toast {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+                justify-content: center;
+            }
+            
+            /* 在移动端调整离线版标识位置 */
+            .offline-badge {
+                top: 10px;
+                left: 10px;
+            }
+        }
+        
+        /* 调整离线版标识位置，避免与主题切换按钮冲突 */
+        body:has(#offlineBadge[style*="display: block"]) .header-controls {
+            top: 60px; /* 当离线版标识显示时，下调控制按钮位置 */
+        }
+        
+        /* 大屏幕下的调整 */
+        @media (min-width: 769px) {
+            .offline-badge {
+                top: 10px;
+                left: 10px;
+            }
+            
+            body:has(#offlineBadge[style*="display: block"]) .header-controls {
+                top: 50px; /* 在大屏幕上调整更合适的距离 */
+            }
         }
     </style>
 </head>
-<body>
+<body class="theme-blue">
+    <!-- 加载动画 -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- 离线版标识 -->
+    <div class="offline-badge" id="offlineBadge">离线版</div>
+    
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="lang-toggle" id="langToggle">
-                    <span class="flag">🇨🇳</span> 中文 / English <span class="flag">🇺🇸</span>
+                <!-- 修改：将控制按钮分为左右两组 -->
+                <div class="header-controls">
+                    <div class="header-controls-left">
+                        <div class="theme-toggle" id="themeToggle" title="点击切换主题">
+                            <span class="theme-icon">🖌</span>
+                            <span class="theme-text" data-en="Emoji Current theme: Click to switch theme">Emoji 当前主题：点击切换主题</span>
+                        </div>
+                    </div>
+                    <div class="header-controls-right">
+                        <div class="lang-toggle" id="langToggle">
+                            <span class="flag">🇨🇳</span> <span data-en="中文">中文</span> / <span data-en="English">English</span> <span class="flag">🇺🇸</span>
+                        </div>
+                        <button class="download-btn" id="downloadBtn">
+                            <i class="fas fa-download"></i> <span data-en="Download offline version">下载离线版</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="avatar-container">
-                    <img src="https://mms2.baidu.com/it/u=4244366110,482929212&fm=253&app=120&f=JPEG?w=500&h=500" alt="头像" class="avatar">
+                    <img src="https://mms2.baidu.com/it/u=4244366110,482929212&fm=253&app=120&f=JPEG?w=500&h=500" 
+                         alt="头像" 
+                         class="avatar"
+                         onerror="this.onerror=null; this.src=''; this.classList.add('avatar-error'); this.innerHTML='<i class=\"fas fa-user\"></i>'">
                 </div>
                 <h1 class="name">Gaoxdwqxql</h1>
-                <p class="title"><span class="pulse"></span> 开发者 & 编程爱好者</p>
+                <p class="title"><span class="pulse"></span> <span data-en="Developers & Programming Enthusiasts">开发者 & 编程爱好者</span></p>
             </div>
             
             <div class="content">
@@ -335,7 +625,7 @@
                         </div>
                         <div class="info-content">
                             <h3 data-en="Title / Salutation">称呼</h3>
-                            <p>孙先生 <span class="flag">🇨🇳</span></p>
+                            <p><span data-en="Mr. Sun">孙先生</span> <span class="flag">🇨🇳</span></p>
                         </div>
                     </div>
                     
@@ -388,14 +678,14 @@
                             <div class="link-icon">
                                 <i class="fab fa-bilibili" style="color: #fb7299;"></i>
                             </div>
-                            <div class="link-name">Bilibili <span class="flag">🇨🇳</span></div>
+                            <div class="link-name">Bilibili</div>
                         </a>
                         
                         <a href="https://www.luogu.com.cn/user/1805189" target="_blank" class="link-item luogu">
                             <div class="link-icon">
                                 <i class="fas fa-code" style="color: #ffa116;"></i>
                             </div>
-                            <div class="link-name">洛谷</div>
+                            <div class="link-name" data-en="LuoGu">洛谷</div>
                         </a>
                         
                         <a href="https://github.com/Gaoxdwqxql/" target="_blank" class="link-item github">
@@ -405,11 +695,11 @@
                             <div class="link-name">GitHub</div>
                         </a>
                         
-                        <a href="https://gaoxdwqxql.github.io" target="_blank" class="link-item website">
+                        <a href="https://author.baidu.com/home?context={&quot;from&quot;:&quot;personal-center&quot;,&quot;uk&quot;:&quot;drewsvpqwP0lJn7WFmUfpQ&quot;,&quot;tab&quot;:&quot;dynamic&quot;}" target="_blank" class="link-item website">
                             <div class="link-icon">
-                                <i class="fas fa-home" style="color: #3498db;"></i>
+                                <img src="https://www.baidu.com/favicon.ico" style="width: 32px; height: 32px;" alt="百度">
                             </div>
-                            <div class="link-name" data-en="Personal Website">个人网站</div>
+                            <div class="link-name" data-en="Baidu">百度</div>
                         </a>
                     </div>
                     
@@ -436,19 +726,101 @@
             </div>
             
             <div class="footer">
-                <p data-en="Last updated: July 2023 | Designed with ❤️">最后更新：2026年1月 | 用心设计 <span style="color: #e74c3c;">❤️</span></p>
+                <p data-en="Last updated: January 2026 | Designed with ❤️">最后更新：2026年1月 | 用心设计 <span style="color: #e74c3c;">❤️</span></p>
+                <p style="margin-top: 5px; font-size: 0.8rem;" data-en="Click the 'Offline Version' button to download this page">点击"离线版"按钮可下载此页面</p>
             </div>
         </div>
     </div>
 
+    <!-- 下载提示 -->
+    <div id="downloadToast" class="download-toast" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">离线版下载中...</span>
+    </div>
+
     <script>
+        // 加载动画控制
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                document.getElementById('loadingOverlay').style.visibility = 'hidden';
+            }, 500);
+        });
+        
+        // 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const themes = ['theme-light', 'theme-dark', 'theme-blue'];
+        let currentThemeIndex = 2; // 默认蓝色主题
+        
+        // 从localStorage加载保存的主题
+        const savedTheme = localStorage.getItem('preferredTheme');
+        if (savedTheme) {
+            document.body.className = savedTheme;
+            currentThemeIndex = themes.indexOf(savedTheme);
+        }
+        
+        // 更新主题按钮的文字和图标
+        function updateThemeButton() {
+            const themeIcon = themeToggle.querySelector('.theme-icon');
+            const themeText = themeToggle.querySelector('.theme-text');
+            const currentTheme = document.body.className;
+            
+            if (currentTheme === 'theme-light') {
+                
+                themeToggle.title = '当前：浅色主题 (点击切换)';
+                // 更新按钮文字
+                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
+                themeText.textContent = isEnglish ? '☀️ Current theme: Light (Click to switch)' : '☀️ 当前主题：浅色 (点击切换)';
+            } else if (currentTheme === 'theme-dark') {
+                
+                themeToggle.title = '当前：深色主题 (点击切换)';
+                // 更新按钮文字
+                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
+                themeText.textContent = isEnglish ? '🌙 Current theme: Dark (Click to switch)' : '🌙 当前主题：深色 (点击切换)';
+            } else {
+                
+                themeToggle.title = '当前：渐变主题 (点击切换)';
+                // 更新按钮文字
+                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
+                themeText.textContent = isEnglish ? '🎨 Current theme: Gradient (Click to switch)' : '🎨 当前主题：渐变 (点击切换)';
+            }
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const newTheme = themes[currentThemeIndex];
+            document.body.className = newTheme;
+            
+            // 保存主题偏好
+            localStorage.setItem('preferredTheme', newTheme);
+            
+            // 更新主题按钮
+            updateThemeButton();
+        });
+        
+        // 初始化主题按钮
+        updateThemeButton();
+        
         // 中英文切换功能
         const langToggle = document.getElementById('langToggle');
         let isEnglish = false;
         
+        // 从localStorage加载语言设置
+        const savedLang = localStorage.getItem('preferredLanguage');
+        if (savedLang === 'en') {
+            isEnglish = true;
+            updateLanguage();
+        }
+        
         langToggle.addEventListener('click', () => {
             isEnglish = !isEnglish;
             updateLanguage();
+            
+            // 保存语言偏好
+            localStorage.setItem('preferredLanguage', isEnglish ? 'en' : 'zh');
+            
+            // 更新主题按钮文字
+            updateThemeButton();
         });
         
         function updateLanguage() {
@@ -458,7 +830,10 @@
                 if (isEnglish) {
                     const originalText = element.textContent;
                     element.setAttribute('data-zh', originalText);
-                    element.textContent = element.getAttribute('data-en');
+                    const enText = element.getAttribute('data-en');
+                    if (enText) {
+                        element.textContent = enText;
+                    }
                 } else {
                     if (element.hasAttribute('data-zh')) {
                         element.textContent = element.getAttribute('data-zh');
@@ -468,14 +843,21 @@
             });
             
             // 更新国旗
-            const flags = document.querySelectorAll('.flag');
+            const flags = langToggle.querySelectorAll('.flag');
             if (isEnglish) {
-                langToggle.innerHTML = '<span class="flag">🇨🇳</span> 中文 / English <span class="flag">🇺🇸</span>';
-                // 更新特定位置的国旗
-                document.querySelector('.info-item:nth-child(2) .flag').textContent = '🇨🇳';
+                langToggle.innerHTML = '<span class="flag">🇺🇸</span> English / <span data-en="中文">中文</span> <span class="flag">🇨🇳</span>';
+                // 重新绑定翻译
+                const spans = langToggle.querySelectorAll('[data-en]');
+                spans.forEach(span => {
+                    span.setAttribute('data-en', span.textContent === '中文' ? 'Chinese' : '中文');
+                });
             } else {
-                langToggle.innerHTML = '<span class="flag">🇨🇳</span> 中文 / English <span class="flag">🇺🇸</span>';
-                document.querySelector('.info-item:nth-child(2) .flag').textContent = '🇨🇳';
+                langToggle.innerHTML = '<span class="flag">🇨🇳</span> <span data-en="中文">中文</span> / English <span class="flag">🇺🇸</span>';
+                // 重新绑定翻译
+                const spans = langToggle.querySelectorAll('[data-en]');
+                spans.forEach(span => {
+                    span.setAttribute('data-en', 'Chinese');
+                });
             }
         }
         
@@ -484,25 +866,211 @@
         linkItems.forEach(item => {
             item.addEventListener('mouseenter', function() {
                 const icon = this.querySelector('.link-icon i');
-                icon.style.transform = 'scale(1.2)';
-                icon.style.transition = 'transform 0.3s';
+                if (icon) {
+                    icon.style.transform = 'scale(1.2)';
+                    icon.style.transition = 'transform 0.3s';
+                }
             });
             
             item.addEventListener('mouseleave', function() {
                 const icon = this.querySelector('.link-icon i');
-                icon.style.transform = 'scale(1)';
+                if (icon) {
+                    icon.style.transform = 'scale(1)';
+                }
             });
         });
         
         // 头像点击效果
         const avatar = document.querySelector('.avatar');
-        avatar.addEventListener('click', function() {
-            this.style.transform = 'scale(1.1)';
+        if (avatar) {
+            avatar.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 300);
+            });
+        }
+        
+        // 图片错误处理
+        function handleImageError(img) {
+            img.onerror = null;
+            img.src = '';
+            img.classList.add('avatar-error');
+            img.innerHTML = '<i class="fas fa-user"></i>';
+        }
+        
+        // 将图片转换为Base64
+        function imageToBase64(url, callback) {
+            if (!url || url === '') {
+                callback(null);
+                return;
+            }
+            
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                try {
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                    callback(dataURL);
+                } catch (error) {
+                    console.error('转换图片为Base64时出错:', error);
+                    callback(null);
+                }
+            };
+            
+            img.onerror = function() {
+                console.error('加载图片时出错:', url);
+                callback(null);
+            };
+            
+            img.src = url;
+        }
+        
+        // 下载离线版功能
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadToast = document.getElementById('downloadToast');
+        const toastMessage = document.getElementById('toastMessage');
+        const offlineBadge = document.getElementById('offlineBadge');
+        
+        downloadBtn.addEventListener('click', downloadOfflineVersion);
+        
+        async function downloadOfflineVersion() {
+            // 显示下载提示
+            showDownloadToast('正在准备离线版...', '#2ecc71');
+            
+            try {
+                // 获取当前页面的HTML内容
+                let htmlContent = document.documentElement.outerHTML;
+                
+                // 获取头像图片并转换为Base64
+                const avatarImg = document.querySelector('.avatar');
+                const avatarSrc = avatarImg.src;
+                
+                if (avatarSrc && avatarSrc.startsWith('http')) {
+                    const base64Image = await new Promise((resolve) => {
+                        imageToBase64(avatarSrc, resolve);
+                    });
+                    
+                    if (base64Image) {
+                        // 替换HTML中的图片src为Base64
+                        htmlContent = htmlContent.replace(
+                            avatarSrc, 
+                            base64Image
+                        );
+                    }
+                }
+                
+                // 修改HTML内容，添加离线版标识并移除下载功能
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                
+                // 添加离线版标识
+                const badgeElement = tempDiv.querySelector('#offlineBadge');
+                if (badgeElement) {
+                    badgeElement.style.display = 'block';
+                }
+                
+                // 移除下载按钮
+                const downloadBtnElement = tempDiv.querySelector('#downloadBtn');
+                if (downloadBtnElement) {
+                    downloadBtnElement.parentNode.removeChild(downloadBtnElement);
+                }
+                
+                // 移除下载相关的JavaScript代码
+                const scriptTags = tempDiv.querySelectorAll('script');
+                scriptTags.forEach(script => {
+                    const scriptContent = script.textContent || '';
+                    if (scriptContent.includes('downloadOfflineVersion') || 
+                        scriptContent.includes('downloadBtn.addEventListener')) {
+                        script.parentNode.removeChild(script);
+                    }
+                });
+                
+                // 获取修改后的HTML
+                const modifiedHtml = tempDiv.innerHTML;
+                
+                // 创建Blob对象
+                const blob = new Blob([modifiedHtml], { type: 'text/html' });
+                
+                // 创建下载链接
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Gaoxdwqxql_个人主页_离线版_${new Date().toISOString().split('T')[0]}.html`;
+                
+                // 更新下载提示
+                showDownloadToast('离线版准备完成，开始下载...', '#2ecc71');
+                
+                // 触发下载
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    // 更新提示信息
+                    setTimeout(() => {
+                        showDownloadToast('下载完成！文件已保存', '#27ae60');
+                    }, 500);
+                }, 100);
+                
+            } catch (error) {
+                console.error('生成离线版时出错:', error);
+                showDownloadToast('生成离线版时出错，请重试', '#e74c3c', true);
+            }
+        }
+        
+        function showDownloadToast(message, color, isError = false) {
+            toastMessage.textContent = message;
+            downloadToast.style.display = 'flex';
+            downloadToast.style.background = color;
+            
+            if (isError) {
+                downloadToast.classList.add('error');
+            } else {
+                downloadToast.classList.remove('error');
+            }
+            
+            downloadToast.classList.remove('hide');
+            
+            // 3秒后自动隐藏
             setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 300);
+                downloadToast.classList.add('hide');
+                setTimeout(() => {
+                    downloadToast.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        // 为下载按钮添加键盘快捷键 (Alt+D)
+        document.addEventListener('keydown', function(event) {
+            if (event.altKey && event.key === 'd') {
+                event.preventDefault();
+                downloadOfflineVersion();
+            }
+        });
+        
+        // 更新下载按钮的提示
+        downloadBtn.title = "下载离线版 (快捷键: Alt+D)";
+        
+        // 错误处理：监听全局错误
+        window.addEventListener('error', function(event) {
+            console.error('全局错误:', event.error);
+        });
+        
+        // 处理Promise未捕获的错误
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('未处理的Promise错误:', event.reason);
         });
     </script>
 </body>
 </html>
-
