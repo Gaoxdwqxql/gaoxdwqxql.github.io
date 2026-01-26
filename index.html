@@ -1,13 +1,507 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>测试页面</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaoxdwqxql | 个人主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: avatarFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes avatarFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .avatar-container:hover .avatar {
+            transform: scale(1.05);
+        }
+        
+        .name {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .title {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+        
+        .info-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 70px;
+            height: 2px;
+            background: #3498db;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .info-item:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .info-content h3 {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .info-content p {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .links-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+        }
+        
+        .link-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .link-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .link-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .link-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .link-item.github {
+            border-top: 4px solid #333;
+        }
+        
+        .link-item.bilibili {
+            border-top: 4px solid #fb7299;
+        }
+        
+        .link-item.luogu {
+            border-top: 4px solid #ffa116;
+        }
+        
+        .link-item.website {
+            border-top: 4px solid #3498db;
+        }
+        
+        .hidden-info {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .flag {
+            margin-left: 8px;
+            font-size: 1.2em;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            background: rgba(245, 245, 245, 0.8);
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .name {
+                font-size: 2rem;
+            }
+            
+            .avatar-container {
+                width: 130px;
+                height: 130px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>网站地址：https://gaoxdwqxql.github.io</p>
-    <p>作者：@^(*($%@$-2026</p>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="lang-toggle" id="langToggle">
+                    <span class="flag">🇨🇳</span> 中文 / English <span class="flag">🇺🇸</span>
+                </div>
+                <div class="avatar-container">
+                    <img src="https://mms2.baidu.com/it/u=4244366110,482929212&fm=253&app=120&f=JPEG?w=500&h=500" alt="头像" class="avatar">
+                </div>
+                <h1 class="name">Gaoxdwqxql</h1>
+                <p class="title"><span class="pulse"></span> 开发者 & 编程爱好者</p>
+            </div>
+            
+            <div class="content">
+                <div class="info-section">
+                    <h2 class="section-title" data-en="Personal Information">个人信息</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Nickname">昵称</h3>
+                            <p>Gaoxdwqxql</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Title / Salutation">称呼</h3>
+                            <p>孙先生 <span class="flag">🇨🇳</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Phone">电话</h3>
+                            <p class="hidden-info" data-en="Hidden">隐藏</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Email">邮箱</h3>
+                            <p class="hidden-info" data-en="Hidden">隐藏</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fab fa-weixin"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="WeChat">微信</h3>
+                            <p class="hidden-info" data-en="Hidden">隐藏</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Website">个人网站</h3>
+                            <p>gaoxdwqxql.github.io</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section links-section">
+                    <h2 class="section-title" data-en="Online Profiles">在线资料</h2>
+                    
+                    <div class="links-grid">
+                        <a href="https://b23.tv/gYgX6im" target="_blank" class="link-item bilibili">
+                            <div class="link-icon">
+                                <i class="fab fa-bilibili" style="color: #fb7299;"></i>
+                            </div>
+                            <div class="link-name">Bilibili <span class="flag">🇨🇳</span></div>
+                        </a>
+                        
+                        <a href="https://www.luogu.com.cn/user/1805189" target="_blank" class="link-item luogu">
+                            <div class="link-icon">
+                                <i class="fas fa-code" style="color: #ffa116;"></i>
+                            </div>
+                            <div class="link-name">洛谷</div>
+                        </a>
+                        
+                        <a href="https://github.com/Gaoxdwqxql/" target="_blank" class="link-item github">
+                            <div class="link-icon">
+                                <i class="fab fa-github" style="color: #333;"></i>
+                            </div>
+                            <div class="link-name">GitHub</div>
+                        </a>
+                        
+                        <a href="https://gaoxdwqxql.github.io" target="_blank" class="link-item website">
+                            <div class="link-icon">
+                                <i class="fas fa-home" style="color: #3498db;"></i>
+                            </div>
+                            <div class="link-name" data-en="Personal Website">个人网站</div>
+                        </a>
+                    </div>
+                    
+                    <div class="info-item" style="margin-top: 30px;">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="About Me">关于我</h3>
+                            <p data-en="A passionate developer interested in programming, algorithms and open source projects.">热爱编程、算法和开源项目的开发者</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 data-en="Location">所在地</h3>
+                            <p data-en="China">中国 <span class="flag">🇨🇳</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p data-en="Last updated: July 2023 | Designed with ❤️">最后更新：2026年1月 | 用心设计 <span style="color: #e74c3c;">❤️</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 中英文切换功能
+        const langToggle = document.getElementById('langToggle');
+        let isEnglish = false;
+        
+        langToggle.addEventListener('click', () => {
+            isEnglish = !isEnglish;
+            updateLanguage();
+        });
+        
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-en]');
+            
+            elements.forEach(element => {
+                if (isEnglish) {
+                    const originalText = element.textContent;
+                    element.setAttribute('data-zh', originalText);
+                    element.textContent = element.getAttribute('data-en');
+                } else {
+                    if (element.hasAttribute('data-zh')) {
+                        element.textContent = element.getAttribute('data-zh');
+                        element.removeAttribute('data-zh');
+                    }
+                }
+            });
+            
+            // 更新国旗
+            const flags = document.querySelectorAll('.flag');
+            if (isEnglish) {
+                langToggle.innerHTML = '<span class="flag">🇨🇳?</span> 中文 / English <span class="flag">🇺🇸</span>';
+                // 更新特定位置的国旗
+                document.querySelector('.info-item:nth-child(2) .flag').textContent = '🇨🇳';
+            } else {
+                langToggle.innerHTML = '<span class="flag">🇨🇳</span> 中文 / English <span class="flag">🇺🇸</span>';
+                document.querySelector('.info-item:nth-child(2) .flag').textContent = '🇨🇳';
+            }
+        }
+        
+        // 链接悬停效果增强
+        const linkItems = document.querySelectorAll('.link-item');
+        linkItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.link-icon i');
+                icon.style.transform = 'scale(1.2)';
+                icon.style.transition = 'transform 0.3s';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('.link-icon i');
+                icon.style.transform = 'scale(1)';
+            });
+        });
+        
+        // 头像点击效果
+        const avatar = document.querySelector('.avatar');
+        avatar.addEventListener('click', function() {
+            this.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 300);
+        });
+    </script>
 </body>
-
 </html>
-
