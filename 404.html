@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>404 · 页面未找到</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f7fb 0%, #e9eef3 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* 主容器：直角，无圆角 */
+        .error-container {
+            max-width: 700px;
+            width: 100%;
+            background: #ffffff;
+            padding: 3rem 2.5rem 3.5rem 2.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.02);
+            text-align: center;
+            transition: transform 0.2s ease;
+            border: 1px solid #e2e8f0;
+            border-radius: 0px;
+        }
+
+        .error-container:hover {
+            transform: translateY(-3px);
+        }
+
+        /* 404 数字：大胆现代 */
+        .error-code {
+            font-size: 8.5rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(120deg, #1e2a3e, #2c3e50);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            animation: subtleGlide 3s ease-in-out infinite;
+        }
+
+        @keyframes subtleGlide {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0f1722;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .error-message {
+            font-size: 1rem;
+            color: #2d3a4b;
+            line-height: 1.5;
+            max-width: 480px;
+            margin: 0 auto 2rem auto;
+            border-left: 3px solid #9aaebf;
+            padding-left: 1.2rem;
+            text-align: left;
+        }
+
+        /* 主页按钮：直角 + 无圆角 */
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            background: #111827;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.85rem 2rem;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            border-radius: 0px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .home-button:hover {
+            background: #1f2a3e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.2);
+        }
+
+        .home-button:active {
+            transform: translateY(1px);
+        }
+
+        /* 底部提示区域：无 emoji，纯文字直角标签 */
+        .suggestion {
+            margin-top: 2.5rem;
+            font-size: 0.85rem;
+            color: #4b5c72;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.6rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .suggestion span {
+            background: #f1f5f9;
+            padding: 0.3rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 450;
+            letter-spacing: 0.01em;
+            border-radius: 0px;
+            color: #1e2f41;
+        }
+
+        /* 响应式调整，依然保持直角 */
+        @media (max-width: 560px) {
+            .error-container {
+                padding: 2rem 1.5rem 2.5rem 1.5rem;
+            }
+            .error-code {
+                font-size: 5.2rem;
+            }
+            .error-title {
+                font-size: 1.6rem;
+            }
+            .error-message {
+                font-size: 0.9rem;
+                padding-left: 0.9rem;
+            }
+            .home-button {
+                padding: 0.7rem 1.6rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 淡入动画 */
+        .fade-in {
+            animation: fadeUp 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 确保没有任何圆角残留 */
+        button, a, div, span, .error-container, .home-button, .suggestion span {
+            border-radius: 0px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container fade-in">
+        <div class="error-code">404</div>
+        <h1 class="error-title">页面未找到</h1>
+        <div class="error-message">
+            你访问的页面不存在，可能是链接失效或者地址输入有误。<br>
+            返回首页继续浏览，或检查网址拼写。
+        </div>
+        <a href="/" class="home-button" aria-label="返回主页">
+            <!-- 纯图标线条，不含 emoji -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 21 9 13 15 13 15 21"/>
+            </svg>
+            返回首页
+        </a>
+        <div class="suggestion">
+            <span>检查网址拼写</span>
+            <span>gaoxdwqxql.github.io 主页</span>
+        </div>
+    </div>
+</body>
+</html>
