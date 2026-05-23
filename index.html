@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Gaoxdwqxql | 个人主页</title>
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -188,7 +188,7 @@
             font-weight: 300;
         }
         
-        /* 修改：将控制按钮分为左右两组 */
+        /* 控制按钮容器：绝对定位（桌面端） */
         .header-controls {
             position: absolute;
             top: 20px;
@@ -209,7 +209,6 @@
             gap: 10px;
         }
         
-        /* 修改：调整主题切换按钮样式，添加文字 */
         .theme-toggle {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
@@ -224,7 +223,7 @@
             border: none;
             color: white;
             font-family: inherit;
-            min-width: 220px; /* 给按钮足够的宽度显示文字 */
+            min-width: 220px;
         }
         
         .lang-toggle, .download-btn {
@@ -243,7 +242,12 @@
             font-family: inherit;
         }
         
-        .theme-toggle:hover, .lang-toggle:hover, .download-btn:hover {
+        .download-btn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .theme-toggle:hover, .lang-toggle:hover, .download-btn:hover:not(.disabled) {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
@@ -465,7 +469,6 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
         
-        /* 下载提示样式 */
         .download-toast {
             position: fixed;
             bottom: 20px;
@@ -499,6 +502,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
+        /* ========= 修复窄屏设备（20:9等）头像与按钮重叠问题 ========= */
         @media (max-width: 768px) {
             .content {
                 flex-direction: column;
@@ -512,16 +516,31 @@
             .avatar-container {
                 width: 130px;
                 height: 130px;
+                margin-top: 20px;
             }
             
             .header-controls {
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
                 flex-direction: column;
-                gap: 10px;
+                gap: 12px;
+                margin-bottom: 20px;
             }
             
-            .header-controls-left, .header-controls-right {
+            .header-controls-left,
+            .header-controls-right {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .header-controls-left {
+                flex-wrap: wrap;
+            }
+            
+            .header-controls-right {
+                flex-wrap: wrap;
             }
             
             .theme-toggle {
@@ -535,6 +554,11 @@
                 font-size: 0.85rem;
             }
             
+            .header {
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+            
             .download-toast {
                 left: 20px;
                 right: 20px;
@@ -542,19 +566,16 @@
                 justify-content: center;
             }
             
-            /* 在移动端调整离线版标识位置 */
             .offline-badge {
                 top: 10px;
                 left: 10px;
             }
+            
+            body:has(#offlineBadge[style*="display: block"]) .header {
+                padding-top: 45px;
+            }
         }
         
-        /* 调整离线版标识位置，避免与主题切换按钮冲突 */
-        body:has(#offlineBadge[style*="display: block"]) .header-controls {
-            top: 60px; /* 当离线版标识显示时，下调控制按钮位置 */
-        }
-        
-        /* 大屏幕下的调整 */
         @media (min-width: 769px) {
             .offline-badge {
                 top: 10px;
@@ -562,24 +583,21 @@
             }
             
             body:has(#offlineBadge[style*="display: block"]) .header-controls {
-                top: 50px; /* 在大屏幕上调整更合适的距离 */
+                top: 50px;
             }
         }
     </style>
 </head>
 <body class="theme-blue">
-    <!-- 加载动画 -->
     <div id="loadingOverlay">
         <div class="spinner"></div>
     </div>
     
-    <!-- 离线版标识 -->
     <div class="offline-badge" id="offlineBadge">离线版</div>
     
     <div class="container">
         <div class="card">
             <div class="header">
-                <!-- 修改：将控制按钮分为左右两组 -->
                 <div class="header-controls">
                     <div class="header-controls-left">
                         <div class="theme-toggle" id="themeToggle" title="点击切换主题">
@@ -733,7 +751,6 @@
         </div>
     </div>
 
-    <!-- 下载提示 -->
     <div id="downloadToast" class="download-toast" style="display: none;">
         <i class="fas fa-check-circle"></i>
         <span id="toastMessage">离线版下载中...</span>
@@ -743,96 +760,82 @@
         // 加载动画控制
         window.addEventListener('load', function() {
             setTimeout(() => {
-                document.getElementById('loadingOverlay').style.opacity = '0';
-                document.getElementById('loadingOverlay').style.visibility = 'hidden';
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    overlay.style.visibility = 'hidden';
+                }
             }, 500);
         });
         
         // 主题切换功能
         const themeToggle = document.getElementById('themeToggle');
         const themes = ['theme-light', 'theme-dark', 'theme-blue'];
-        let currentThemeIndex = 2; // 默认蓝色主题
+        let currentThemeIndex = 2;
         
-        // 从localStorage加载保存的主题
         const savedTheme = localStorage.getItem('preferredTheme');
-        if (savedTheme) {
+        if (savedTheme && themes.includes(savedTheme)) {
             document.body.className = savedTheme;
             currentThemeIndex = themes.indexOf(savedTheme);
         }
         
-        // 更新主题按钮的文字和图标
         function updateThemeButton() {
-            const themeIcon = themeToggle.querySelector('.theme-icon');
             const themeText = themeToggle.querySelector('.theme-text');
             const currentTheme = document.body.className;
+            const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
             
             if (currentTheme === 'theme-light') {
-                
                 themeToggle.title = '当前：浅色主题 (点击切换)';
-                // 更新按钮文字
-                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
                 themeText.textContent = isEnglish ? '☀️ Current theme: Light (Click to switch)' : '☀️ 当前主题：浅色 (点击切换)';
             } else if (currentTheme === 'theme-dark') {
-                
                 themeToggle.title = '当前：深色主题 (点击切换)';
-                // 更新按钮文字
-                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
                 themeText.textContent = isEnglish ? '🌙 Current theme: Dark (Click to switch)' : '🌙 当前主题：深色 (点击切换)';
             } else {
-                
                 themeToggle.title = '当前：渐变主题 (点击切换)';
-                // 更新按钮文字
-                const isEnglish = localStorage.getItem('preferredLanguage') === 'en';
                 themeText.textContent = isEnglish ? '🎨 Current theme: Gradient (Click to switch)' : '🎨 当前主题：渐变 (点击切换)';
             }
         }
         
-        themeToggle.addEventListener('click', () => {
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            const newTheme = themes[currentThemeIndex];
-            document.body.className = newTheme;
-            
-            // 保存主题偏好
-            localStorage.setItem('preferredTheme', newTheme);
-            
-            // 更新主题按钮
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                const newTheme = themes[currentThemeIndex];
+                document.body.className = newTheme;
+                localStorage.setItem('preferredTheme', newTheme);
+                updateThemeButton();
+            });
             updateThemeButton();
-        });
+        }
         
-        // 初始化主题按钮
-        updateThemeButton();
-        
-        // 中英文切换功能
+        // 中英文切换
         const langToggle = document.getElementById('langToggle');
         let isEnglish = false;
         
-        // 从localStorage加载语言设置
         const savedLang = localStorage.getItem('preferredLanguage');
         if (savedLang === 'en') {
             isEnglish = true;
             updateLanguage();
         }
         
-        langToggle.addEventListener('click', () => {
-            isEnglish = !isEnglish;
-            updateLanguage();
-            
-            // 保存语言偏好
-            localStorage.setItem('preferredLanguage', isEnglish ? 'en' : 'zh');
-            
-            // 更新主题按钮文字
-            updateThemeButton();
-        });
+        if (langToggle) {
+            langToggle.addEventListener('click', () => {
+                isEnglish = !isEnglish;
+                updateLanguage();
+                localStorage.setItem('preferredLanguage', isEnglish ? 'en' : 'zh');
+                updateThemeButton();
+            });
+        }
         
         function updateLanguage() {
             const elements = document.querySelectorAll('[data-en]');
-            
             elements.forEach(element => {
                 if (isEnglish) {
                     const originalText = element.textContent;
-                    element.setAttribute('data-zh', originalText);
+                    if (!element.hasAttribute('data-zh')) {
+                        element.setAttribute('data-zh', originalText);
+                    }
                     const enText = element.getAttribute('data-en');
-                    if (enText) {
+                    if (enText && enText !== originalText) {
                         element.textContent = enText;
                     }
                 } else {
@@ -843,43 +846,23 @@
                 }
             });
             
-            // 更新国旗
-            const flags = langToggle.querySelectorAll('.flag');
-            if (isEnglish) {
-                langToggle.innerHTML = '<span class="flag">🇺🇸</span> English / <span data-en="中文">中文</span> <span class="flag">🇨🇳</span>';
-                // 重新绑定翻译
+            if (langToggle) {
+                if (isEnglish) {
+                    langToggle.innerHTML = '<span class="flag">🇺🇸</span> English / <span data-en="中文">中文</span> <span class="flag">🇨🇳</span>';
+                } else {
+                    langToggle.innerHTML = '<span class="flag">🇨🇳</span> <span data-en="中文">中文</span> / English <span class="flag">🇺🇸</span>';
+                }
+                // 重新绑定翻译属性（简单重新初始化）
                 const spans = langToggle.querySelectorAll('[data-en]');
                 spans.forEach(span => {
-                    span.setAttribute('data-en', span.textContent === '中文' ? 'Chinese' : '中文');
-                });
-            } else {
-                langToggle.innerHTML = '<span class="flag">🇨🇳</span> <span data-en="中文">中文</span> / English <span class="flag">🇺🇸</span>';
-                // 重新绑定翻译
-                const spans = langToggle.querySelectorAll('[data-en]');
-                spans.forEach(span => {
-                    span.setAttribute('data-en', 'Chinese');
+                    if (isEnglish) {
+                        if (span.textContent === '中文') span.setAttribute('data-en', 'Chinese');
+                    } else {
+                        span.setAttribute('data-en', 'Chinese');
+                    }
                 });
             }
         }
-        
-        // 链接悬停效果增强
-        const linkItems = document.querySelectorAll('.link-item');
-        linkItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                const icon = this.querySelector('.link-icon i');
-                if (icon) {
-                    icon.style.transform = 'scale(1.2)';
-                    icon.style.transition = 'transform 0.3s';
-                }
-            });
-            
-            item.addEventListener('mouseleave', function() {
-                const icon = this.querySelector('.link-icon i');
-                if (icon) {
-                    icon.style.transform = 'scale(1)';
-                }
-            });
-        });
         
         // 头像点击效果
         const avatar = document.querySelector('.avatar');
@@ -892,133 +875,95 @@
             });
         }
         
-        // 图片错误处理
-        function handleImageError(img) {
-            img.onerror = null;
-            img.src = '';
-            img.classList.add('avatar-error');
-            img.innerHTML = '<i class="fas fa-user"></i>';
-        }
-        
-        // 将图片转换为Base64
-        function imageToBase64(url, callback) {
-            if (!url || url === '') {
-                callback(null);
-                return;
-            }
-            
-            const img = new Image();
-            img.crossOrigin = 'Anonymous';
-            
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                try {
-                    const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                    callback(dataURL);
-                } catch (error) {
-                    console.error('转换图片为Base64时出错:', error);
-                    callback(null);
-                }
-            };
-            
-            img.onerror = function() {
-                console.error('加载图片时出错:', url);
-                callback(null);
-            };
-            
-            img.src = url;
-        }
-        
-        // 下载离线版功能
+        // 下载离线版功能 (修复：保留按钮但禁用重复下载)
         const downloadBtn = document.getElementById('downloadBtn');
         const downloadToast = document.getElementById('downloadToast');
         const toastMessage = document.getElementById('toastMessage');
         const offlineBadge = document.getElementById('offlineBadge');
         
-        downloadBtn.addEventListener('click', downloadOfflineVersion);
+        // 检测是否已经是离线版（通过URL参数或标识）
+        const isOfflineVersion = window.location.search.includes('offline=true') || 
+                                 document.body.getAttribute('data-offline') === 'true';
+        
+        if (isOfflineVersion && offlineBadge) {
+            offlineBadge.style.display = 'block';
+            if (downloadBtn) {
+                downloadBtn.disabled = true;
+                downloadBtn.classList.add('disabled');
+                downloadBtn.innerHTML = '<i class="fas fa-ban"></i> <span>已是离线版</span>';
+                downloadBtn.title = '当前已是离线版本，无需再次下载';
+            }
+        }
+        
+        // 确保下载按钮只在非离线版时工作
+        if (downloadBtn && !isOfflineVersion) {
+            downloadBtn.addEventListener('click', downloadOfflineVersion);
+            downloadBtn.title = "下载离线版 (快捷键: Alt+D)";
+        } else if (downloadBtn && isOfflineVersion) {
+            downloadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showDownloadToast('已是离线版，无需重复下载', '#e67e22', false);
+            });
+        }
         
         async function downloadOfflineVersion() {
-            // 显示下载提示
             showDownloadToast('正在准备离线版...', '#2ecc71');
             
             try {
-                // 获取当前页面的HTML内容
+                // 获取当前页面的完整HTML
                 let htmlContent = document.documentElement.outerHTML;
                 
-                // 获取头像图片并转换为Base64
-                const avatarImg = document.querySelector('.avatar');
-                const avatarSrc = avatarImg.src;
-                
-                if (avatarSrc && avatarSrc.startsWith('http')) {
-                    const base64Image = await new Promise((resolve) => {
-                        imageToBase64(avatarSrc, resolve);
-                    });
-                    
-                    if (base64Image) {
-                        // 替换HTML中的图片src为Base64
-                        htmlContent = htmlContent.replace(
-                            avatarSrc, 
-                            base64Image
-                        );
-                    }
-                }
-                
-                // 修改HTML内容，添加离线版标识并移除下载功能
+                // 修改标识：添加离线版标记，但不删除任何按钮
+                // 方案：在保存的HTML中，将下载按钮替换为不可用状态，并添加离线版标识样式
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = htmlContent;
                 
-                // 添加离线版标识
-                const badgeElement = tempDiv.querySelector('#offlineBadge');
-                if (badgeElement) {
-                    badgeElement.style.display = 'block';
+                // 1. 显示离线版标识
+                const badge = tempDiv.querySelector('#offlineBadge');
+                if (badge) badge.style.display = 'block';
+                
+                // 2. 修改下载按钮为禁用状态，并改变文字
+                const dlBtn = tempDiv.querySelector('#downloadBtn');
+                if (dlBtn) {
+                    dlBtn.disabled = true;
+                    dlBtn.classList.add('disabled');
+                    dlBtn.innerHTML = '<i class="fas fa-ban"></i> <span>已是离线版</span>';
+                    // 移除原有的事件监听（通过替换克隆实现，新HTML中不会有原始监听器）
                 }
                 
-                // 移除下载按钮
-                const downloadBtnElement = tempDiv.querySelector('#downloadBtn');
-                if (downloadBtnElement) {
-                    downloadBtnElement.parentNode.removeChild(downloadBtnElement);
-                }
-                
-                // 移除下载相关的JavaScript代码
-                const scriptTags = tempDiv.querySelectorAll('script');
-                scriptTags.forEach(script => {
-                    const scriptContent = script.textContent || '';
-                    if (scriptContent.includes('downloadOfflineVersion') || 
-                        scriptContent.includes('downloadBtn.addEventListener')) {
-                        script.parentNode.removeChild(script);
+                // 3. 修改脚本：确保离线版中下载按钮不会再次触发下载（通过重写相关函数）
+                const scripts = tempDiv.querySelectorAll('script');
+                scripts.forEach(script => {
+                    if (script.textContent.includes('downloadOfflineVersion')) {
+                        // 替换函数内容，使其失效
+                        let newScriptContent = script.textContent.replace(
+                            /function downloadOfflineVersion\(\)\s*\{[\s\S]*?\}/,
+                            `function downloadOfflineVersion() { 
+                                showDownloadToast('已是离线版，无需重复下载', '#e67e22', false);
+                            }`
+                        );
+                        // 同时确保检测离线版本的代码正确运行
+                        if (!newScriptContent.includes('isOfflineVersion')) {
+                            newScriptContent = `const isOfflineVersion = true;\n` + newScriptContent;
+                        }
+                        script.textContent = newScriptContent;
                     }
                 });
                 
-                // 获取修改后的HTML
                 const modifiedHtml = tempDiv.innerHTML;
-                
-                // 创建Blob对象
                 const blob = new Blob([modifiedHtml], { type: 'text/html' });
-                
-                // 创建下载链接
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `Gaoxdwqxql_个人主页_离线版_${new Date().toISOString().split('T')[0]}.html`;
                 
-                // 更新下载提示
                 showDownloadToast('离线版准备完成，开始下载...', '#2ecc71');
-                
-                // 触发下载
                 document.body.appendChild(a);
                 a.click();
                 
-                // 清理
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                    
-                    // 更新提示信息
                     setTimeout(() => {
                         showDownloadToast('下载完成！文件已保存', '#27ae60');
                     }, 500);
@@ -1031,6 +976,7 @@
         }
         
         function showDownloadToast(message, color, isError = false) {
+            if (!toastMessage || !downloadToast) return;
             toastMessage.textContent = message;
             downloadToast.style.display = 'flex';
             downloadToast.style.background = color;
@@ -1043,7 +989,6 @@
             
             downloadToast.classList.remove('hide');
             
-            // 3秒后自动隐藏
             setTimeout(() => {
                 downloadToast.classList.add('hide');
                 setTimeout(() => {
@@ -1052,23 +997,18 @@
             }, 3000);
         }
         
-        // 为下载按钮添加键盘快捷键 (Alt+D)
         document.addEventListener('keydown', function(event) {
-            if (event.altKey && event.key === 'd') {
+            if (event.altKey && event.key === 'd' && downloadBtn && !downloadBtn.disabled && !isOfflineVersion) {
                 event.preventDefault();
                 downloadOfflineVersion();
             }
         });
         
-        // 更新下载按钮的提示
-        downloadBtn.title = "下载离线版 (快捷键: Alt+D)";
-        
-        // 错误处理：监听全局错误
+        // 错误处理
         window.addEventListener('error', function(event) {
             console.error('全局错误:', event.error);
         });
         
-        // 处理Promise未捕获的错误
         window.addEventListener('unhandledrejection', function(event) {
             console.error('未处理的Promise错误:', event.reason);
         });
